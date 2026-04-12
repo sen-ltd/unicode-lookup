@@ -1,0 +1,12 @@
+{
+  "name": "unicode-lookup",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Unicode codepoint lookup with UTF-8/16 bytes, normalization forms, and block browsing.",
+  "scripts": {
+    "test": "node --test tests/*.test.js",
+    "serve": "python3 -m http.server 8080"
+  },
+  "license": "MIT"
+}

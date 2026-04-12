@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Unicode Lookup</title>
+  <meta name="description" content="Unicode codepoint lookup with UTF-8/16 bytes, normalization forms, and block browsing." />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Header -->
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="header-title">
+        <h1 data-i18n="title">Unicode Lookup</h1>
+        <p class="tagline" data-i18n="tagline">Explore Unicode characters, codepoints, and encodings</p>
+      </div>
+      <div class="header-controls">
+        <button id="lang-toggle" class="icon-btn" aria-label="Toggle language">EN / JA</button>
+        <button id="theme-toggle" class="icon-btn" aria-label="Toggle theme" data-i18n="darkTheme">Dark</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Search area -->
+  <main class="main-content">
+    <section class="search-section">
+      <!-- Mode tabs -->
+      <nav class="mode-tabs" role="tablist" aria-label="Search mode">
+        <button class="mode-tab active" data-mode="char" role="tab" data-i18n="modeChar">By Character</button>
+        <button class="mode-tab" data-mode="codepoint" role="tab" data-i18n="modeCodepoint">By Codepoint</button>
+        <button class="mode-tab" data-mode="name" role="tab" data-i18n="modeName">By Name / Keyword</button>
+        <button class="mode-tab" data-mode="block" role="tab" data-i18n="modeBlock">Browse Blocks</button>
+      </nav>
+
+      <!-- Search input -->
+      <div class="search-bar">
+        <input
+          type="text"
+          id="search-input"
+          class="search-input"
+          autocomplete="off"
+          autocorrect="off"
+          autocapitalize="off"
+          spellcheck="false"
+          data-i18n-placeholder="searchPlaceholder"
+          placeholder="Paste a character, U+XXXX, 0xXXXX, decimal, or keyword…"
+          aria-label="Search input"
+        />
+      </div>
+
+      <!-- Inline search results (name mode) -->
+      <div id="search-results" class="search-results" role="region" aria-live="polite"></div>
+    </section>
+
+    <!-- Character info panel -->
+    <section id="char-panel" class="char-panel" style="display:none" aria-label="Character info">
+      <div class="char-display-wrapper">
+        <div id="char-display" class="char-display" role="img" aria-label="Character preview"></div>
+      </div>
+
+      <div id="info-grid" class="info-grid" role="list"></div>
+    </section>
+
+    <!-- Unicode normalization -->
+    <section id="normalization-section" class="normalization-section" style="display:none">
+      <h2 data-i18n="normalizationTitle">Unicode Normalization</h2>
+      <div id="norm-grid" class="norm-grid"></div>
+    </section>
+
+    <!-- Block browser -->
+    <section id="block-browser" class="block-browser" style="display:none" aria-label="Block browser">
+      <h2 data-i18n="blockBrowserTitle">Browse Blocks</h2>
+      <div class="block-filter-bar">
+        <input
+          type="text"
+          id="block-filter"
+          class="search-input block-filter-input"
+          data-i18n-placeholder="blockSearchPlaceholder"
+          placeholder="Filter blocks…"
+          aria-label="Filter blocks"
+        />
+      </div>
+      <div id="block-list" class="block-list"></div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>
+      Built by <a href="https://sen.ltd" target="_blank" rel="noopener">SEN LLC</a> &mdash;
+      Zero dependencies, vanilla JS.
+      <a href="https://github.com/masaru87/unicode-lookup" target="_blank" rel="noopener">GitHub</a>
+    </p>
+  </footer>
+
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>
