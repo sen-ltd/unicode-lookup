@@ -57,3 +57,10 @@ unicode-lookup/
 ## License
 
 MIT — Copyright (c) 2026 SEN LLC (SEN 合同会社)
+
+<!-- sen-publish:links -->
+## Links
+
+- 🌐 Demo: https://sen.ltd/portfolio/unicode-lookup/
+- 📝 dev.to: https://dev.to/sendotltd/a-unicode-lookup-tool-that-shows-utf-8-bytes-surrogate-pairs-and-all-four-normalization-forms-h6p
+<!-- /sen-publish:links -->
