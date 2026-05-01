@@ -481,6 +481,76 @@ function handleSearch(value) {
 }
 
 // ---------------------------------------------------------------------------
+// URL state (mode + query, restored on load and on back/forward)
+// ---------------------------------------------------------------------------
+//
+// Encoding: #mode=<mode>&q=<query>[&filter=<filter>]
+//   - mode is one of char | codepoint | name | block
+//   - q is the search input (URI-encoded)
+//   - filter is the block-mode filter input (URI-encoded), only for block mode
+// `q` and `filter` are omitted when empty so plain mode-only URLs are short.
+
+let suspendUrlUpdate = false; // set true while we restore from URL to avoid feedback loops
+
+function updateUrl() {
+  if (suspendUrlUpdate) return;
+  const params = new URLSearchParams();
+  params.set('mode', currentMode);
+  if (currentMode === 'block') {
+    const filter = $id('block-filter')?.value || '';
+    if (filter) params.set('filter', filter);
+  } else {
+    const q = $id('search-input')?.value || '';
+    if (q) params.set('q', q);
+  }
+  const hash = '#' + params.toString();
+  // Avoid pushing identical state — keeps the back-stack clean.
+  if (hash !== location.hash) {
+    history.replaceState(null, '', hash);
+  }
+}
+
+function readUrlState() {
+  // Strip the leading '#' and parse as URLSearchParams.
+  const raw = location.hash.startsWith('#') ? location.hash.slice(1) : '';
+  const params = new URLSearchParams(raw);
+  const mode = params.get('mode');
+  const q = params.get('q') || '';
+  const filter = params.get('filter') || '';
+  return { mode, q, filter };
+}
+
+function applyUrlState(state) {
+  // Restore without triggering URL writes for each intermediate step.
+  suspendUrlUpdate = true;
+  try {
+    const validModes = ['char', 'codepoint', 'name', 'block'];
+    const mode = validModes.includes(state.mode) ? state.mode : 'char';
+    setMode(mode);
+    if (mode === 'block') {
+      const blockFilter = $id('block-filter');
+      if (blockFilter) {
+        blockFilter.value = state.filter;
+        renderBlockBrowser(state.filter.trim());
+      }
+    } else {
+      const input = $id('search-input');
+      if (input) {
+        input.value = state.q;
+        if (state.q.trim()) {
+          handleSearch(state.q.trim());
+        } else {
+          hidePanels();
+          showMessage(t('enterToSearch'));
+        }
+      }
+    }
+  } finally {
+    suspendUrlUpdate = false;
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Init
 // ---------------------------------------------------------------------------
 
@@ -503,6 +573,7 @@ export function init() {
       if (input && input.value && currentMode !== 'block') {
         handleSearch(input.value.trim());
       }
+      updateUrl();
     });
   });
 
@@ -511,10 +582,12 @@ export function init() {
   if (searchInput) {
     searchInput.addEventListener('input', (e) => {
       handleSearch(e.target.value.trim());
+      updateUrl();
     });
     searchInput.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
         handleSearch(e.target.value.trim());
+        updateUrl();
       }
     });
   }
@@ -524,6 +597,7 @@ export function init() {
   if (blockFilter) {
     blockFilter.addEventListener('input', (e) => {
       renderBlockBrowser(e.target.value.trim());
+      updateUrl();
     });
   }
 
@@ -554,12 +628,20 @@ export function init() {
     });
   }
 
-  // Set initial mode
-  setMode('char');
+  // Restore state from URL hash if present, else fall through to default.
+  const initialState = readUrlState();
+  if (initialState.mode) {
+    applyUrlState(initialState);
+  } else {
+    setMode('char');
+    hidePanels();
+    showMessage(t('enterToSearch'));
+  }
 
-  // Show default example
-  hidePanels();
-  showMessage(t('enterToSearch'));
+  // Browser back/forward — re-apply whatever the new URL says.
+  window.addEventListener('hashchange', () => {
+    applyUrlState(readUrlState());
+  });
 }
 
 // Run on DOM ready
